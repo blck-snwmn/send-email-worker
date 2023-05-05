@@ -1,36 +1,33 @@
+import { EmailMessage } from "cloudflare:email";
+import { createMimeMessage } from "mimetext";
+
 export interface Env {
+  SEB: SendEmail
   FROM: string
   TO: string
 }
 export default {
   async fetch(request: Request, env: Env) {
-    const req = new Request('https://api.mailchannels.net/tx/v1/send', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        personalizations: [
-          {
-            to: [{ email: env.TO, name: 'Test Recipient' }],
-          },
-        ],
-        from: {
-          email: env.FROM,
-          name: 'Workers - MailChannels integration',
-        },
-        subject: 'Look! No servers',
-        content: [
-          {
-            type: 'text/plain',
-            value: 'And no email service accounts and all for free too!',
-          },
-        ],
-      }),
+    const msg = createMimeMessage();
+    msg.setSender(env.FROM);
+    msg.setRecipient(env.TO);
+    msg.setSubject("Look! No servers");
+    msg.addMessage({
+      contentType: "text/plain",
+      data: "And no email service accounts and all for free too!",
     })
-    const resp = await fetch(req)
-    const body = await resp.text()
-    console.log(body)
-    return new Response("Hello world")
+
+    const message = new EmailMessage(
+      env.FROM,
+      env.TO,
+      msg.asRaw(),
+    );
+
+    try {
+      await env.SEB.send(message);
+    } catch (e: any) {
+      new Response(e.message)
+    }
+    return new Response("Hello Send Email World!")
   }
 }

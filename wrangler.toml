@@ -2,7 +2,9 @@ name = "send-email-worker"
 main = "src/index.ts"
 compatibility_date = "2023-01-29"
 usage_model = "bundled"
-env = { }
+send_email = [
+    {type = "send_email", name = "SEB"},
+]
 
 [triggers]
 crons = [ ]
