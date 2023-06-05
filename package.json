@@ -12,6 +12,6 @@
     "deploy": "wrangler publish"
   },
   "dependencies": {
-    "mimetext": "^3.0.10"
+    "mimetext": "^3.0.13"
   }
 }
